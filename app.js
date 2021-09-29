@@ -26,8 +26,8 @@ const game = () => rl.question(`Entrez un nombre entre 0 et ${guess_game.max_num
         console.log("Le nombre est plus grand");
     }
 
-    game();
     guess_game.count++;
+    game();
 });
 
 game();
