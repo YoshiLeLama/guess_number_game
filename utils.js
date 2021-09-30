@@ -1,23 +1,35 @@
-import {readFileSync} from 'fs';
+import { createInterface, cursorTo, clearScreenDown } from 'readline';
+import { readFileSync } from 'fs';
 
-const CONFIG_FILE_NAME = 'game_config.json';
+const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
 export const random = (min, max) => min + Math.floor(Math.random() * (max + 1));
 
-export const load_config = () => {
-    let game = {
-        guess_limit: 0,
-        max_number: 0,
-        secret_number: 0,
-        count: 1
-    };
+/**
+ * 
+ * @param {string} question 
+ * @param {Function} callback Fonction de callback qui prend un string en paramètre
+ */
+export const promptQuestion = (question, callback) => {
+    rl.question(question, res => callback(res));
+}
 
-    const data = readFileSync(CONFIG_FILE_NAME)
-    let config = JSON.parse(data);
-    game.guess_limit = config.guess_limit;
-    game.max_number = config.max_number;
+/**
+ * 
+ * @param {string} name 
+ * @returns {object}
+ */
+export const readConfigFile = (name) => {
+    const data = readFileSync(name)
+    return JSON.parse(data);
+}
 
-    game.secret_number = random(0, game.max_number);
+export const closePrompt = () => rl.close();
 
-    return game;
+export const clearConsole = () => {
+    cursorTo(process.stdout, 0, 0);
+    clearScreenDown(process.stdout);
 }
