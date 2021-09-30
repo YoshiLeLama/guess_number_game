@@ -6,7 +6,13 @@ const rl = createInterface({
     output: process.stdout
 });
 
-export const random = (min, max) => min + Math.floor(Math.random() * (max + 1));
+/**
+ * 
+ * @param {number} min 
+ * @param {number} max 
+ * @returns {number}
+ */
+export const random = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
 
 /**
  * 
