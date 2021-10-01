@@ -1,7 +1,8 @@
 import { random, promptQuestion, readConfigFile, closePrompt, clearConsole } from "./utils.js";
 
 const CONFIG_FILE_NAME = 'game_config.json';
-
+const DEFAULT_MIN = 0;
+const DEFAULT_MAX = 9;
 export class GuessGame {
     constructor() {
         this.load_config();
@@ -11,7 +12,7 @@ export class GuessGame {
     init() {
         clearConsole();
         this.drawSecretNumber();
-        this.count = 1;
+        this.turn = 1;
     }
 
     start() {
@@ -23,33 +24,35 @@ export class GuessGame {
     }
 
     load_config() {
-        const config = readConfigFile(CONFIG_FILE_NAME);
-        this.guess_limit = config.guess_limit;
-        this.max_number = config.max_number;
+        const { guess_limit, min_number, max_number } = readConfigFile(CONFIG_FILE_NAME);
+        this.guess_limit = guess_limit;
+        this.min_number = min_number ? min_number : DEFAULT_MIN;
+        this.max_number = max_number ? max_number : DEFAULT_MAX;
     }
 
     guess() {
-        promptQuestion(`(${this.guess_limit - this.count + 1} essais restants) Entrez un nombre entre 0 et ${this.max_number} : `, (response) => {
+        promptQuestion(`(${this.guess_limit - this.turn + 1} essais restants) Entrez un nombre entre ${this.min_number} et ${this.max_number} : `,
+            (response) => {
+                let user_number = parseInt(response);
 
-            let user_number = parseInt(response);
+                if (user_number > this.max_number || user_number < this.min_number || isNaN(user_number)) {
+                    this.guess();
+                    return;
+                } else if (user_number == this.secret_number) {
+                    console.log(`Bravo ! Vous avez deviné le nombre après ${this.turn} essais`);
+                    return this.gameover();
+                } else if (this.turn >= this.guess_limit) {
+                    console.log(`Perdu ! Le nombre était ${this.secret_number}`);
+                    return this.gameover();
+                } else if (user_number > this.secret_number) {
+                    console.log("Le nombre est plus petit");
+                } else {
+                    console.log("Le nombre est plus grand");
+                }
 
-            if (user_number == this.secret_number) {
-                console.log(`Bravo ! Vous avez deviné le nombre après ${this.count} essais`);
-                return this.gameover();
-            } else if (user_number > this.max_number || user_number < 0) {
-                game();
-            } else if (this.count >= this.guess_limit) {
-                console.log("Perdu ! Vous n'avez pas réussi à trouver le nombre :(");
-                return this.gameover();
-            } else if (user_number > this.secret_number) {
-                console.log("Le nombre est plus petit");
-            } else {
-                console.log("Le nombre est plus grand");
-            }
-
-            this.count++;
-            this.guess();
-        });
+                this.turn++;
+                this.guess();
+            });
     }
 
     gameover(displayMessage = true) {
