@@ -11,7 +11,7 @@ export class GuessGame {
 
     init() {
         clearConsole();
-        this.drawSecretNumber();
+        this.pickSecretNumber();
         this.turn = 1;
     }
 
@@ -19,8 +19,8 @@ export class GuessGame {
         this.guess();
     }
 
-    drawSecretNumber() {
-        this.secret_number = random(0, this.max_number);
+    pickSecretNumber() {
+        this.secret_number = random(this.min_number, this.max_number);
     }
 
     load_config() {
